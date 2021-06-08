@@ -1,14 +1,13 @@
 package ru.hse.utils;
 
 import org.junit.jupiter.api.Test;
-import ru.hse.utils.Utils;
+import ru.hse.TestUtils;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
 
 import static java.util.Arrays.sort;
-import static ru.hse.Utils.randomIntArray;
 import static ru.hse.utils.Utils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +16,7 @@ class UtilsTest {
     public void testBubbleSort() {
         Random random = new Random(5338);
         for (int i = 0; i < 1000; i++) {
-            int[] arr1 = randomIntArray(random);
+            int[] arr1 = TestUtils.randomIntArray(random);
             int[] arr2 = arr1.clone();
 
             sort(arr1);
