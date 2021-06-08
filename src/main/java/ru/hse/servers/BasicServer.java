@@ -9,14 +9,11 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static ru.hse.utils.Constants.PORT;
 import static ru.hse.utils.Utils.bubbleSort;
 
-public class BasicServer {
+public class BasicServer implements Server {
     private ServerSocket serverSocket = null;
 
     private final ExecutorService serverSocketService = Executors.newSingleThreadExecutor();
@@ -26,26 +23,14 @@ public class BasicServer {
 
     private final ConcurrentHashMap.KeySetView<Client, Boolean> clients = ConcurrentHashMap.newKeySet();
 
-    private final Lock stopLock = new ReentrantLock();
-    private final Condition stopCondition = stopLock.newCondition();
-
+    @Override
     public void start() throws IOException {
         serverSocket = new ServerSocket(PORT);
+        System.out.println("Server socket created");
         serverSocketService.submit(() -> acceptClients(serverSocket));
-
-        stopLock.lock();
-        try {
-            while (isWorking) {
-                stopCondition.await();
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            stopLock.unlock();
-        }
     }
 
+    @Override
     public void stop() {
         try {
             isWorking = false;
@@ -53,8 +38,8 @@ public class BasicServer {
             workerThreadPool.shutdown();
             serverSocketService.shutdown();
             clients.forEach(Client::close);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
+
         }
     }
 
@@ -111,8 +96,8 @@ public class BasicServer {
                             sendResponse(data);
                         });
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ignored) {
+
                 }
             });
         }

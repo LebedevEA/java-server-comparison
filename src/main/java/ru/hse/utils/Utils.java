@@ -5,6 +5,7 @@ import ru.hse.utils.protocols.Array;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -46,5 +47,15 @@ public class Utils {
         inputStream.readFully(buf);
 
         return Array.parseFrom(buf).getArrayList().stream().mapToInt(i -> i).toArray();
+    }
+
+    public static int[] randomIntArray(Random random, int size) {
+        int[] array = new int[size];
+
+        for (int i = 0; i < array.length; i++) {
+            array[i] = random.nextInt(100_000);
+        }
+
+        return array;
     }
 }
