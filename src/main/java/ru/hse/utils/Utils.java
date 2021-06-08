@@ -1,9 +1,11 @@
 package ru.hse.utils;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import ru.hse.utils.protocols.Array;
+
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Utils {
     private Utils() { }
@@ -25,10 +27,24 @@ public class Utils {
     }
 
     public static void writeArray(DataOutputStream outputStream, int[] data) throws IOException {
-        // TODO
+        var array = Array.newBuilder()
+                .setSize(data.length)
+                .addAllArray(
+                        Arrays.stream(data)
+                                .boxed().
+                                collect(Collectors.toList())
+                )
+                .build();
+        byte[] buf = array.toByteArray();
+        outputStream.writeInt(buf.length);
+        outputStream.write(buf);
     }
 
     public static int[] readArray(DataInputStream inputStream) throws IOException {
-        return new int[0]; // TODO
+        int bufLen = inputStream.readInt();
+        byte[] buf = new byte[bufLen];
+        inputStream.readFully(buf);
+
+        return Array.parseFrom(buf).getArrayList().stream().mapToInt(i -> i).toArray();
     }
 }
