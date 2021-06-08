@@ -29,7 +29,6 @@ public class Utils {
 
     public static void writeArray(DataOutputStream outputStream, int[] data) throws IOException {
         var array = Array.newBuilder()
-                .setSize(data.length)
                 .addAllArray(
                         Arrays.stream(data)
                                 .boxed().

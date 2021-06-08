@@ -8,17 +8,6 @@ public interface ArrayOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>required int32 size = 1;</code>
-   * @return Whether the size field is set.
-   */
-  boolean hasSize();
-  /**
-   * <code>required int32 size = 1;</code>
-   * @return The size.
-   */
-  int getSize();
-
-  /**
    * <code>repeated int32 array = 2;</code>
    * @return A list containing the array.
    */

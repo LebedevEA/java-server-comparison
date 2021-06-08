@@ -6,7 +6,8 @@ option java_multiple_files = true;
 option java_package = "ru.hse.utils.protocols";
 option java_outer_classname = "ArrayProto";
 
+//    protoc -I=src/main/resources --java_out=src/main/java/ src/main/resources/array.proto
+
 message Array {
-  required int32 size = 1;
   repeated int32 array = 2;
 }

@@ -50,15 +50,10 @@ private static final long serialVersionUID = 0L;
           case 0:
             done = true;
             break;
-          case 8: {
-            bitField0_ |= 0x00000001;
-            size_ = input.readInt32();
-            break;
-          }
           case 16: {
-            if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
               array_ = newIntList();
-              mutable_bitField0_ |= 0x00000002;
+              mutable_bitField0_ |= 0x00000001;
             }
             array_.addInt(input.readInt32());
             break;
@@ -66,9 +61,9 @@ private static final long serialVersionUID = 0L;
           case 18: {
             int length = input.readRawVarint32();
             int limit = input.pushLimit(length);
-            if (!((mutable_bitField0_ & 0x00000002) != 0) && input.getBytesUntilLimit() > 0) {
+            if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
               array_ = newIntList();
-              mutable_bitField0_ |= 0x00000002;
+              mutable_bitField0_ |= 0x00000001;
             }
             while (input.getBytesUntilLimit() > 0) {
               array_.addInt(input.readInt32());
@@ -91,7 +86,7 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000002) != 0)) {
+      if (((mutable_bitField0_ & 0x00000001) != 0)) {
         array_.makeImmutable(); // C
       }
       this.unknownFields = unknownFields.build();
@@ -109,26 +104,6 @@ private static final long serialVersionUID = 0L;
     return ru.hse.utils.protocols.ArrayProto.internal_static_utils_Array_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             ru.hse.utils.protocols.Array.class, ru.hse.utils.protocols.Array.Builder.class);
-  }
-
-  private int bitField0_;
-  public static final int SIZE_FIELD_NUMBER = 1;
-  private int size_;
-  /**
-   * <code>required int32 size = 1;</code>
-   * @return Whether the size field is set.
-   */
-  @java.lang.Override
-  public boolean hasSize() {
-    return ((bitField0_ & 0x00000001) != 0);
-  }
-  /**
-   * <code>required int32 size = 1;</code>
-   * @return The size.
-   */
-  @java.lang.Override
-  public int getSize() {
-    return size_;
   }
 
   public static final int ARRAY_FIELD_NUMBER = 2;
@@ -165,10 +140,6 @@ private static final long serialVersionUID = 0L;
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
-    if (!hasSize()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -176,9 +147,6 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (((bitField0_ & 0x00000001) != 0)) {
-      output.writeInt32(1, size_);
-    }
     for (int i = 0; i < array_.size(); i++) {
       output.writeInt32(2, array_.getInt(i));
     }
@@ -191,10 +159,6 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (((bitField0_ & 0x00000001) != 0)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(1, size_);
-    }
     {
       int dataSize = 0;
       for (int i = 0; i < array_.size(); i++) {
@@ -219,11 +183,6 @@ private static final long serialVersionUID = 0L;
     }
     ru.hse.utils.protocols.Array other = (ru.hse.utils.protocols.Array) obj;
 
-    if (hasSize() != other.hasSize()) return false;
-    if (hasSize()) {
-      if (getSize()
-          != other.getSize()) return false;
-    }
     if (!getArrayList()
         .equals(other.getArrayList())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
@@ -237,10 +196,6 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasSize()) {
-      hash = (37 * hash) + SIZE_FIELD_NUMBER;
-      hash = (53 * hash) + getSize();
-    }
     if (getArrayCount() > 0) {
       hash = (37 * hash) + ARRAY_FIELD_NUMBER;
       hash = (53 * hash) + getArrayList().hashCode();
@@ -378,10 +333,8 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      size_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000001);
       array_ = emptyIntList();
-      bitField0_ = (bitField0_ & ~0x00000002);
+      bitField0_ = (bitField0_ & ~0x00000001);
       return this;
     }
 
@@ -409,17 +362,11 @@ private static final long serialVersionUID = 0L;
     public ru.hse.utils.protocols.Array buildPartial() {
       ru.hse.utils.protocols.Array result = new ru.hse.utils.protocols.Array(this);
       int from_bitField0_ = bitField0_;
-      int to_bitField0_ = 0;
-      if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.size_ = size_;
-        to_bitField0_ |= 0x00000001;
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         array_.makeImmutable();
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000001);
       }
       result.array_ = array_;
-      result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
     }
@@ -468,13 +415,10 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(ru.hse.utils.protocols.Array other) {
       if (other == ru.hse.utils.protocols.Array.getDefaultInstance()) return this;
-      if (other.hasSize()) {
-        setSize(other.getSize());
-      }
       if (!other.array_.isEmpty()) {
         if (array_.isEmpty()) {
           array_ = other.array_;
-          bitField0_ = (bitField0_ & ~0x00000002);
+          bitField0_ = (bitField0_ & ~0x00000001);
         } else {
           ensureArrayIsMutable();
           array_.addAll(other.array_);
@@ -488,9 +432,6 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public final boolean isInitialized() {
-      if (!hasSize()) {
-        return false;
-      }
       return true;
     }
 
@@ -514,50 +455,11 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private int size_ ;
-    /**
-     * <code>required int32 size = 1;</code>
-     * @return Whether the size field is set.
-     */
-    @java.lang.Override
-    public boolean hasSize() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>required int32 size = 1;</code>
-     * @return The size.
-     */
-    @java.lang.Override
-    public int getSize() {
-      return size_;
-    }
-    /**
-     * <code>required int32 size = 1;</code>
-     * @param value The size to set.
-     * @return This builder for chaining.
-     */
-    public Builder setSize(int value) {
-      bitField0_ |= 0x00000001;
-      size_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>required int32 size = 1;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearSize() {
-      bitField0_ = (bitField0_ & ~0x00000001);
-      size_ = 0;
-      onChanged();
-      return this;
-    }
-
     private com.google.protobuf.Internal.IntList array_ = emptyIntList();
     private void ensureArrayIsMutable() {
-      if (!((bitField0_ & 0x00000002) != 0)) {
+      if (!((bitField0_ & 0x00000001) != 0)) {
         array_ = mutableCopy(array_);
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000001;
        }
     }
     /**
@@ -566,7 +468,7 @@ private static final long serialVersionUID = 0L;
      */
     public java.util.List<java.lang.Integer>
         getArrayList() {
-      return ((bitField0_ & 0x00000002) != 0) ?
+      return ((bitField0_ & 0x00000001) != 0) ?
                java.util.Collections.unmodifiableList(array_) : array_;
     }
     /**
@@ -627,7 +529,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder clearArray() {
       array_ = emptyIntList();
-      bitField0_ = (bitField0_ & ~0x00000002);
+      bitField0_ = (bitField0_ & ~0x00000001);
       onChanged();
       return this;
     }
