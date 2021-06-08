@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package utils;
+
+option java_multiple_files = true;
+option java_package = "ru.hse.utils.protocols";
+option java_outer_classname = "ArrayProto";
+
+message Array {
+  required int32 size = 1;
+  repeated int32 array = 2;
+}
