@@ -12,13 +12,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 class ServerTest {
-    private void baseServerTest(Supplier<Server> makeServer) throws Exception {
-        int clientNum = 100;
-
+    private void baseServerTest(Supplier<Server> makeServer, int clientNum) throws Exception {
         Server server = makeServer.get();
         server.start();
 
-        ExecutorService clientsPool = Executors.newCachedThreadPool();
+        ExecutorService clientsPool = Executors.newFixedThreadPool(64);
         var futures = clientsPool.invokeAll(
                 IntStream.range(0, clientNum).mapToObj(i -> new TestClient()).collect(Collectors.toList())
         );
@@ -34,6 +32,9 @@ class ServerTest {
 
     @Test
     public void basicTest() throws Exception {
-        baseServerTest(BasicServer::new);
+        baseServerTest(BasicServer::new, 10);
+        baseServerTest(BasicServer::new, 100);
+        baseServerTest(BasicServer::new, 1000);
+        baseServerTest(BasicServer::new, 10000); // takes ~17 seconds to work, but work on my pc
     }
 }

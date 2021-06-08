@@ -26,7 +26,6 @@ public class BasicServer implements Server {
     @Override
     public void start() throws IOException {
         serverSocket = new ServerSocket(PORT);
-        System.out.println("Server socket created");
         serverSocketService.submit(() -> acceptClients(serverSocket));
     }
 
@@ -38,9 +37,7 @@ public class BasicServer implements Server {
             workerThreadPool.shutdown();
             serverSocketService.shutdown();
             clients.forEach(Client::close);
-        } catch (IOException ignored) {
-
-        }
+        } catch (IOException ignored) { }
     }
 
     private void acceptClients(ServerSocket serverSocket) {
@@ -51,13 +48,9 @@ public class BasicServer implements Server {
                     Client client = new Client(clientSocket);
                     clients.add(client);
                     client.processClient();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                } catch (IOException ignored1) { }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignored) { }
     }
 
     private class Client {
@@ -96,9 +89,7 @@ public class BasicServer implements Server {
                             sendResponse(data);
                         });
                     }
-                } catch (IOException ignored) {
-
-                }
+                } catch (IOException ignored) { }
             });
         }
 
