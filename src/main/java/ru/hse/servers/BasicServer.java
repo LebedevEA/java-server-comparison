@@ -26,7 +26,7 @@ public class BasicServer implements Server {
     @Override
     public void start() throws IOException {
         serverSocket = new ServerSocket(PORT);
-        serverSocketService.submit(() -> acceptClients(serverSocket));
+        serverSocketService.submit(this::acceptClients);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class BasicServer implements Server {
         } catch (IOException ignored) { }
     }
 
-    private void acceptClients(ServerSocket serverSocket) {
+    private void acceptClients() {
         try (ServerSocket ignored = serverSocket) {
             while (!Thread.interrupted() && isWorking) {
                 try {

@@ -37,4 +37,9 @@ class ServerTest {
         baseServerTest(BasicServer::new, 1000);
         baseServerTest(BasicServer::new, 10000); // takes ~17 seconds to work, but work on my pc
     }
+
+    @Test
+    public void nonBlockingTest() throws Exception {
+        baseServerTest(NonBlockingServer::new, 1);
+    }
 }
