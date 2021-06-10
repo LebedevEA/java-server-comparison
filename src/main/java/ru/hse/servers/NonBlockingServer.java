@@ -2,168 +2,266 @@ package ru.hse.servers;
 
 import ru.hse.utils.Utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static ru.hse.utils.Constants.PORT;
 import static ru.hse.utils.Utils.bubbleSort;
 
 public class NonBlockingServer implements Server {
     private ServerSocketChannel serverSocketChannel = null;
-    private Selector readSelector = null;
+    private Selector requestSelector = null;
+    private Selector responseSelector = null;
 
     private final ExecutorService serverSocketService = Executors.newSingleThreadExecutor();
-    private final ExecutorService readSelectorService = Executors.newSingleThreadExecutor();
-    private final ExecutorService writeSelectorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService requestSelectorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService responseSelectorService = Executors.newSingleThreadExecutor();
     private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(16);
 
-
-    private final Queue<SocketChannel> toRegister = new ConcurrentLinkedQueue<>();
+    private final Queue<SocketChannel> toRegisterRequests = new ConcurrentLinkedQueue<>();
+    private final Queue<Client> toRegisterResponses = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap.KeySetView<Client, Boolean> toUnregister = ConcurrentHashMap.newKeySet();
 
     private volatile boolean isWorking = true;
+    private final Set<Client> clients = new HashSet<>();
 
     @Override
     public void start() throws IOException {
         serverSocketChannel = ServerSocketChannel.open().bind(new InetSocketAddress(PORT));
         serverSocketService.submit(this::acceptClients);
 
-        readSelector = Selector.open();
-        readSelectorService.submit(this::handleClients);
+        requestSelector = Selector.open();
+        requestSelectorService.submit(this::receive);
+
+        responseSelector = Selector.open();
+        responseSelectorService.submit(this::send);
+    }
+
+    @Override
+    public void stop() throws IOException {
+        isWorking = false;
+        serverSocketChannel.close();
+
+        serverSocketService.shutdown();
+        workerThreadPool.shutdown();
+        requestSelectorService.shutdown();
+        responseSelectorService.shutdown();
+
+        responseSelector.wakeup();
+        requestSelector.wakeup();
+
+        clients.forEach(Client::close);
+    }
+
+    private void send() {
+        try {
+            while (!Thread.interrupted() && isWorking) {
+                int selected = responseSelector.select();
+                if (selected > 0) {
+                    System.out.println(count.addAndGet(selected));
+                    handleSelectedResponses();
+                }
+                addClientsToResponse();
+                System.out.println(count.get());
+                toUnregister.forEach(c -> c.socketChannel.keyFor(responseSelector).cancel()); // FIXME вот тут не работает тупо
+            }
+        } catch (IOException ignored) {
+            ignored.printStackTrace();
+        }
+    }
+
+    private void addClientsToResponse() throws ClosedChannelException {
+        if (!isWorking) return;
+        Client client = toRegisterResponses.poll();
+        while (client != null) {
+            toUnregister.remove(client);;
+            client.socketChannel.register(responseSelector, SelectionKey.OP_WRITE, client);
+            client = toRegisterResponses.poll();
+        }
+    }
+
+    private void handleSelectedResponses() {
+        if (!isWorking) return;
+
+        Set<SelectionKey> selectedKeys = responseSelector.selectedKeys();
+        Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+
+        while (keyIterator.hasNext()) {
+            SelectionKey key = keyIterator.next();
+            handleSelectionKeyToResponse(key);
+            keyIterator.remove();
+        };
+    }
+
+    private void handleSelectionKeyToResponse(SelectionKey key) {
+        if (!isWorking) return;
+
+        try {
+            if (!key.isWritable()) throw new RuntimeException("Keys are supposed to be writable here");
+
+            Client client = (Client) key.attachment();
+            SocketChannel socketChannel = (SocketChannel) key.channel();
+
+            client.responseBuffer.flip();
+            socketChannel.write(client.responseBuffer);
+            client.responseBuffer.compact();
+
+            if (client.responseBuffer.hasRemaining()) {
+                toUnregister.add(client);
+            }
+        } catch (IOException ignored) { }
     }
 
     private void acceptClients() {
-        System.out.println("Client accept started");
         try (ServerSocketChannel ignored = serverSocketChannel) {
             while (!Thread.interrupted() && isWorking) {
-//                System.out.println("Client accept cycle in");
                 try {
                     SocketChannel socketChannel = serverSocketChannel.accept();
-                    toRegister.add(socketChannel);
-                    readSelector.wakeup();
-//                    System.out.println("Selector woken up");
+                    toRegisterRequests.add(socketChannel);
+                    requestSelector.wakeup();
                 } catch (IOException ignored1) { }
             }
         } catch (IOException ignored) { }
     }
 
-    private void handleClients() {
+    private void receive() {
         try {
             while (!Thread.interrupted() && isWorking) {
-//                System.out.println("Selector selects");
-                int selected = readSelector.select();
-//                System.out.println("Selector selected " + selected);
+                int selected = requestSelector.select();
                 if (selected > 0) {
-                    handleSelected();
+                    handleSelectedRequests();
                 }
-                addClients();
+                addClientsToReceive();
             }
         } catch (IOException ignored) { }
     }
 
-    private void addClients() throws IOException {
-        SocketChannel socketChannel = toRegister.poll();
+    private void addClientsToReceive() throws IOException {
+        if (!isWorking) return;
+
+        SocketChannel socketChannel = toRegisterRequests.poll();
         while (socketChannel != null) {
-//            System.out.println("Register socketChannel");
+            Client client = new Client(socketChannel);
+            clients.add(client);
+
             socketChannel.configureBlocking(false);
-            socketChannel.register(readSelector, SelectionKey.OP_READ, new Client()); // TODO save client somewhere
-            socketChannel = toRegister.poll();
+            socketChannel.register(requestSelector, SelectionKey.OP_READ, client);
+            socketChannel = toRegisterRequests.poll();
         }
     }
 
-    private void handleSelected() {
-        Set<SelectionKey> selectedKeys = readSelector.selectedKeys();
+    private void handleSelectedRequests() {
+        if (!isWorking) return;
+
+        Set<SelectionKey> selectedKeys = requestSelector.selectedKeys();
         Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
         while (keyIterator.hasNext()) {
             SelectionKey key = keyIterator.next();
-//            System.out.println("Handle selection key");
-            handleSelectionKey(key);
+            handleSelectionKeyToRequest(key);
             keyIterator.remove();
         };
-//        System.out.println("End handle selected");
     }
 
-    private void handleSelectionKey(SelectionKey key) {
+    private void handleSelectionKeyToRequest(SelectionKey key) {
         try {
-            System.out.println("Start handle selection key");
-            if (!key.isReadable()) {
-                throw new RuntimeException("Keys are supposed to be readable here");
-            }
-//            System.out.println("Start handle selection key");
+            if (!key.isReadable()) throw new RuntimeException("Keys are supposed to be readable here");
+
             Client client = (Client) key.attachment();
 
             SocketChannel socketChannel = (SocketChannel) key.channel();
-            int DEBUG = socketChannel.write(client.readBuffer);
-
-            System.out.println(DEBUG);
+            socketChannel.read(client.requestBuffer);
 
             client.handleBuffer();
         } catch (IOException ignored) { }
     }
 
-    @Override
-    public void stop() throws IOException {
-
-    }
-
     private class Client {
-        private final ByteBuffer readBuffer = ByteBuffer.allocate(1024 * 1024); // TODO
-        private final ByteBuffer writeBuffer = ByteBuffer.allocate(1024 * 1024); // TODO
+        private final SocketChannel socketChannel;
+
+        private final ByteBuffer requestBuffer = ByteBuffer.allocate(1024 * 1024); // TODO
+        private final ByteBuffer responseBuffer = ByteBuffer.allocate(1024 * 1024); // TODO
         private int msgSize = -1;
 
+        private volatile boolean working = true;
+
+        private Client(SocketChannel socketChannel) {
+            this.socketChannel = socketChannel;
+        }
+
         public void handleBuffer() throws IOException {
-            readBuffer.flip();
+            if (!working) return;
 
-//            System.out.println("Handling buffer in client & msgSize is " + msgSize);
+            requestBuffer.flip();
 
-            if (msgSize != -1) {
-                if (readBuffer.remaining() < msgSize) {
-                    return;
-                }
-
-                byte[] buf = new byte[msgSize];
-                readBuffer.get(buf);
-                readBuffer.compact();
-                msgSize = -1;
-
-//                System.out.println("Sent to handleMessage");
-                handleMessage(buf);
+            if (msgSize == -1) {
+                if (!tryReadSize()) return;
             } else {
-                if (readBuffer.remaining() < 4) {
-                    return;
-                }
-
-                msgSize = readBuffer.getInt();
-                System.out.println("Int is red & it is " + msgSize);
-                readBuffer.compact();
+                if (!tryReadMessage()) return;
             }
 
-            readBuffer.flip();
+            requestBuffer.compact();
             handleBuffer();
         }
 
+        private boolean tryReadSize() {
+            if (requestBuffer.remaining() < 4) return false;
+            msgSize = requestBuffer.getInt();
+            return true;
+        }
+
+        private boolean tryReadMessage() throws IOException {
+            if (requestBuffer.remaining() < msgSize) return false;
+            byte[] buf = new byte[msgSize];
+            requestBuffer.get(buf);
+            msgSize = -1;
+
+            handleMessage(buf);
+            return true;
+        }
+
         private void handleMessage(byte[] buf) throws IOException {
-            int[] data = Utils.readArray(new DataInputStream(new ByteArrayInputStream(buf)));
-            System.out.println("Before submit to wtp");
+            if (!working) return;
+
+            int[] data = Utils.readArray(buf);
             workerThreadPool.submit(() -> {
-                System.out.println("Worker starts");
                 bubbleSort(data);
                 sendResponse(data);
             });
         }
 
         private void sendResponse(int[] data) {
-            System.out.println("Wants to send");
+            if (!working) return;
+
+            byte[] toSend = Utils.serializeArray(data);
+            responseBuffer.putInt(toSend.length);
+            responseBuffer.put(toSend);
+
+            toRegisterResponses.add(this);
+            responseSelector.wakeup();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(socketChannel, requestBuffer, responseBuffer, msgSize);
+        }
+
+        public void close() {
+            working = false;
+            try {
+                socketChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+    static AtomicInteger count = new AtomicInteger(0); // DEBUG
 }

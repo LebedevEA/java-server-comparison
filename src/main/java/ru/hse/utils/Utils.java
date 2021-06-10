@@ -1,5 +1,6 @@
 package ru.hse.utils;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import ru.hse.utils.protocols.Array;
 
 import java.io.*;
@@ -28,14 +29,7 @@ public class Utils {
     }
 
     public static void writeArray(DataOutputStream outputStream, int[] data) throws IOException {
-        var array = Array.newBuilder()
-                .addAllArray(
-                        Arrays.stream(data)
-                                .boxed().
-                                collect(Collectors.toList())
-                )
-                .build();
-        byte[] buf = array.toByteArray();
+        byte[] buf = serializeArray(data);
         outputStream.writeInt(buf.length);
         outputStream.write(buf);
     }
@@ -45,7 +39,22 @@ public class Utils {
         byte[] buf = new byte[bufLen];
         inputStream.readFully(buf);
 
-        return Array.parseFrom(buf).getArrayList().stream().mapToInt(i -> i).toArray();
+        return readArray(buf);
+    }
+
+    public static byte[] serializeArray(int[] data) {
+        var array = Array.newBuilder()
+                .addAllArray(
+                        Arrays.stream(data)
+                                .boxed().
+                                collect(Collectors.toList())
+                )
+                .build();
+        return array.toByteArray();
+    }
+
+    public static int[] readArray(byte[] data) throws InvalidProtocolBufferException {
+        return Array.parseFrom(data).getArrayList().stream().mapToInt(i -> i).toArray();
     }
 
     public static int[] randomIntArray(Random random, int size) {

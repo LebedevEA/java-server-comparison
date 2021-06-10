@@ -106,18 +106,6 @@ public class BasicServer implements Server {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Client that = (Client) o;
-            return working == that.working && Objects.equals(socket, that.socket)
-                    && Objects.equals(responseWriter, that.responseWriter)
-                    && Objects.equals(requestReader, that.requestReader)
-                    && Objects.equals(inputStream, that.inputStream)
-                    && Objects.equals(outputStream, that.outputStream);
-        }
-
-        @Override
         public int hashCode() {
             return Objects.hash(socket, responseWriter, requestReader, inputStream, outputStream, working);
         }
