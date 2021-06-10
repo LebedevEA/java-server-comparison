@@ -40,6 +40,6 @@ class ServerTest {
 
     @Test
     public void nonBlockingTest() throws Exception {
-        baseServerTest(NonBlockingServer::new, 1);
+        baseServerTest(NonBlockingServer::new, 10);
     }
 }
