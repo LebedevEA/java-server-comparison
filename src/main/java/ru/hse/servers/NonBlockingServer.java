@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static ru.hse.utils.Constants.PORT;
 import static ru.hse.utils.Utils.bubbleSort;
@@ -71,16 +70,14 @@ public class NonBlockingServer implements Server {
                 addClientsToResponse();
 //                toUnregister.forEach(c -> c.socketChannel.keyFor(responseSelector).cancel()); // FIXME вот тут не работает тупо
             }
-        } catch (IOException ignored) {
-            ignored.printStackTrace();
-        }
+        } catch (IOException ignored) { }
     }
 
     private void addClientsToResponse() throws ClosedChannelException {
         if (!isWorking) return;
         Client client = toRegisterResponses.poll();
         while (client != null) {
-            toUnregister.remove(client);;
+            toUnregister.remove(client);
             client.socketChannel.register(responseSelector, SelectionKey.OP_WRITE, client);
             client = toRegisterResponses.poll();
         }
@@ -96,7 +93,7 @@ public class NonBlockingServer implements Server {
             SelectionKey key = keyIterator.next();
             handleSelectionKeyToResponse(key);
             keyIterator.remove();
-        };
+        }
     }
 
     private void handleSelectionKeyToResponse(SelectionKey key) {
@@ -166,7 +163,7 @@ public class NonBlockingServer implements Server {
             SelectionKey key = keyIterator.next();
             handleSelectionKeyToRequest(key);
             keyIterator.remove();
-        };
+        }
     }
 
     private void handleSelectionKeyToRequest(SelectionKey key) {
