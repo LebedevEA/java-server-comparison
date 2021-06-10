@@ -66,12 +66,10 @@ public class NonBlockingServer implements Server {
             while (!Thread.interrupted() && isWorking) {
                 int selected = responseSelector.select();
                 if (selected > 0) {
-                    System.out.println(count.addAndGet(selected));
                     handleSelectedResponses();
                 }
                 addClientsToResponse();
-                System.out.println(count.get());
-                toUnregister.forEach(c -> c.socketChannel.keyFor(responseSelector).cancel()); // FIXME вот тут не работает тупо
+//                toUnregister.forEach(c -> c.socketChannel.keyFor(responseSelector).cancel()); // FIXME вот тут не работает тупо
             }
         } catch (IOException ignored) {
             ignored.printStackTrace();
@@ -187,8 +185,8 @@ public class NonBlockingServer implements Server {
     private class Client {
         private final SocketChannel socketChannel;
 
-        private final ByteBuffer requestBuffer = ByteBuffer.allocate(1024 * 1024); // TODO
-        private final ByteBuffer responseBuffer = ByteBuffer.allocate(1024 * 1024); // TODO
+        private final ByteBuffer requestBuffer = ByteBuffer.allocate(1024 * 16); // TODO
+        private final ByteBuffer responseBuffer = ByteBuffer.allocate(1024 * 16); // TODO
         private int msgSize = -1;
 
         private volatile boolean working = true;
@@ -263,5 +261,4 @@ public class NonBlockingServer implements Server {
             }
         }
     }
-    static AtomicInteger count = new AtomicInteger(0); // DEBUG
 }
