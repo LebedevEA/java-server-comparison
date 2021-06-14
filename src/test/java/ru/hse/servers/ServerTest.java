@@ -6,6 +6,7 @@ import ru.hse.servers.nonblocking.NonBlockingServer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -20,7 +21,7 @@ class ServerTest {
 
         ExecutorService clientsPool = Executors.newFixedThreadPool(64);
         var futures = clientsPool.invokeAll(
-                IntStream.range(0, clientNum).mapToObj(i -> new TestClient()).collect(Collectors.toList())
+                IntStream.range(0, clientNum).mapToObj(i -> new TestClient(new Random(i))).collect(Collectors.toList())
         );
         List<ArrayTestPair> pairs = new ArrayList<>();
         for (Future<ArrayTestPair> future : futures) {
