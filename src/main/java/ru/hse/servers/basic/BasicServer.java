@@ -1,12 +1,11 @@
 package ru.hse.servers.basic;
 
 import ru.hse.servers.Server;
-import ru.hse.utils.Utils;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,7 +20,7 @@ public class BasicServer implements Server {
 
     private volatile boolean isWorking = true;
 
-    private final ConcurrentHashMap.KeySetView<Client, Boolean> clients = ConcurrentHashMap.newKeySet();
+    private final Set<Client> clients = ConcurrentHashMap.newKeySet();
 
     @Override
     public void start() throws IOException {
