@@ -1,5 +1,6 @@
-package ru.hse.servers;
+package ru.hse.servers.basic;
 
+import ru.hse.servers.Server;
 import ru.hse.utils.Utils;
 
 import java.io.*;

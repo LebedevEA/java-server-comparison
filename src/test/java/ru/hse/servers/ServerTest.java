@@ -1,6 +1,8 @@
 package ru.hse.servers;
 
 import org.junit.jupiter.api.Test;
+import ru.hse.servers.basic.BasicServer;
+import ru.hse.servers.nonblocking.NonBlockingServer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,6 @@ class ServerTest {
         baseServerTest(BasicServer::new, 10);
         baseServerTest(BasicServer::new, 100);
         baseServerTest(BasicServer::new, 1000);
-        baseServerTest(BasicServer::new, 10000); // takes ~17 seconds to work, but work on my pc
     }
 
     @Test
@@ -43,6 +44,5 @@ class ServerTest {
         baseServerTest(NonBlockingServer::new, 10);
         baseServerTest(NonBlockingServer::new, 100);
         baseServerTest(NonBlockingServer::new, 1000);
-        baseServerTest(NonBlockingServer::new, 10000);
     }
 }
