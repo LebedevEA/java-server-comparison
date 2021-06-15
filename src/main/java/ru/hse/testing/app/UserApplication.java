@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Application {
+public class UserApplication {
     public static void main(String[] args) throws Exception {
         Cli cli = new Cli();
         if (!cli.collectData()) {

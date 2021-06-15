@@ -105,7 +105,7 @@ public class Cli {
     }
 
     private boolean scanArchitecture(Scanner scanner) {
-        System.out.println("Input testing architecture (blocking, nonblocking, asynchronous)");
+        System.out.println("Input testing architecture [blocking, nonblocking, asynchronous]");
         while (true) {
             System.out.print(">> ");
             String input = scanner.nextLine();
@@ -114,7 +114,7 @@ public class Cli {
                 state.setArchitecture(BlockingServer::new);
             } else if ("nonblocking".equals(input)) {
                 state.setArchitecture(NonBlockingServer::new);
-            } else if ("async".equals(input)) {
+            } else if ("asynchronous".equals(input)) {
                 state.setArchitecture(AsyncServer::new);
             } else if ("exit".equals(input)) {
                 return false;
@@ -156,9 +156,9 @@ public class Cli {
 
     private boolean scanChangingParameter(Scanner scanner) {
         System.out.println("Input changing parameter (as 1, 2, or 3 as follows)");
-        System.out.println("  1: Sorting array length");
-        System.out.println("  2: Number of clients");
-        System.out.println("  3: Wait time between queries");
+        System.out.println("  1 -> Sorting array length");
+        System.out.println("  2 -> Number of clients");
+        System.out.println("  3 -> Wait time between queries");
 
         while (true) {
             System.out.print(">> ");

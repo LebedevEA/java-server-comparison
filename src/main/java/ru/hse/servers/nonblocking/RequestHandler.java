@@ -49,9 +49,9 @@ public class RequestHandler {
     private void handleSelectorKey(SelectionKey key) {
         NonBlockingClientHandler client = (NonBlockingClientHandler) key.attachment();
         client.read();
-        if (client.done()) {
-            key.cancel();
-        }
+//        if (client.done()) {
+//            key.cancel();
+//        }
     }
 
     private void addNew() throws IOException {
