@@ -1,11 +1,14 @@
 package ru.hse.utils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import ru.hse.testing.stats.Result;
+import ru.hse.testing.stats.TestingState;
 import ru.hse.utils.protocols.Array;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -67,5 +70,14 @@ public class Utils {
         }
 
         return array;
+    }
+
+    public static List<Result> runTesting(TestingState state) throws Exception {
+        List<Result> rv = new ArrayList<>();
+        while (state.isValid()) {
+            rv.add(state.runTest());
+            state.makeStep();
+        }
+        return rv;
     }
 }

@@ -38,4 +38,28 @@ public class Result {
                 ", queryWaitTimeOnClient=" + queryWaitTimeOnClient +
                 '}';
     }
+
+    public int getDataLength() {
+        return dataLength;
+    }
+
+    public int getClientNumber() {
+        return clientNumber;
+    }
+
+    public int getQueryWaitTime() {
+        return queryWaitTime;
+    }
+
+    public int getQueryNumberPerClient() {
+        return queryNumberPerClient;
+    }
+
+    public int getQueryWorkTimeOnServer() {
+        return queryWorkTimeOnServer;
+    }
+
+    public int getQueryWaitTimeOnClient() {
+        return queryWaitTimeOnClient;
+    }
 }
