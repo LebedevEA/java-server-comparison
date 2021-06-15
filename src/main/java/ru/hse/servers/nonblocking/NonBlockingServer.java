@@ -21,10 +21,10 @@ public class NonBlockingServer implements Server {
     private final ExecutorService responseService = Executors.newSingleThreadExecutor();
     private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(16);
 
-    private final Queue<Client> addToRequests = new ConcurrentLinkedQueue<>();
-    private final Queue<Client> addToResponses = new ConcurrentLinkedQueue<>();
+    private final Queue<NonBlockingClientHandler> addToRequests = new ConcurrentLinkedQueue<>();
+    private final Queue<NonBlockingClientHandler> addToResponses = new ConcurrentLinkedQueue<>();
 
-    private final Set<Client> clients = ConcurrentHashMap.newKeySet();
+    private final Set<NonBlockingClientHandler> clients = ConcurrentHashMap.newKeySet();
 
     private volatile boolean isWorking = true;
 
@@ -47,7 +47,7 @@ public class NonBlockingServer implements Server {
             while (!Thread.interrupted() && isWorking) {
                 try {
                     SocketChannel clientSocketChannel = serverSocketChannel.accept();
-                    Client client = new Client(clientSocketChannel, workerThreadPool, this::registerResponse);
+                    NonBlockingClientHandler client = new NonBlockingClientHandler(clientSocketChannel, workerThreadPool, this::registerResponse);
                     clients.add(client);
                     addToRequests.add(client);
                     requestHandler.wakeup();
@@ -56,7 +56,7 @@ public class NonBlockingServer implements Server {
         } catch (IOException ignored) { }
     }
 
-    private void registerResponse(Client client) {
+    private void registerResponse(NonBlockingClientHandler client) {
         addToResponses.add(client);
         responseHandler.wakeup();
     }
@@ -76,6 +76,6 @@ public class NonBlockingServer implements Server {
         responseHandler.close();
         responseService.shutdown();
 
-        clients.forEach(Client::stop);
+        clients.forEach(NonBlockingClientHandler::stop);
     }
 }

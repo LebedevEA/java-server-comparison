@@ -1,12 +1,12 @@
 package ru.hse.servers.async.callbacks;
 
-import ru.hse.servers.async.Client;
+import ru.hse.servers.async.AsyncClientHandler;
 
 import java.nio.channels.CompletionHandler;
 
-public class ReadSizeCompletionHandler implements CompletionHandler<Integer, Client> {
+public class ReadSizeCompletionHandler implements CompletionHandler<Integer, AsyncClientHandler> {
     @Override
-    public void completed(Integer result, Client attachment) {
+    public void completed(Integer result, AsyncClientHandler attachment) {
         if (!attachment.isWorking() || result == -1) return;
 
         if (attachment.getRequests().hasRemaining()) {
@@ -19,7 +19,7 @@ public class ReadSizeCompletionHandler implements CompletionHandler<Integer, Cli
     }
 
     @Override
-    public void failed(Throwable exc, Client attachment) {
+    public void failed(Throwable exc, AsyncClientHandler attachment) {
         throw new RuntimeException(exc);
     }
 }

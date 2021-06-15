@@ -9,11 +9,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RequestHandler {
     private final Selector selector = Selector.open();
-    private final Queue<Client> newClients;
+    private final Queue<NonBlockingClientHandler> newClients;
 
     private volatile boolean isWorking = true;
 
-    public RequestHandler(Queue<Client> addToRequests) throws IOException {
+    public RequestHandler(Queue<NonBlockingClientHandler> addToRequests) throws IOException {
         this.newClients = addToRequests;
     }
 
@@ -49,7 +49,7 @@ public class RequestHandler {
 
     private final AtomicInteger counter = new AtomicInteger(0);
     private void handleSelectorKey(SelectionKey key) {
-        Client client = (Client) key.attachment();
+        NonBlockingClientHandler client = (NonBlockingClientHandler) key.attachment();
         client.read();
         if (client.done()) {
             key.cancel();
@@ -57,7 +57,7 @@ public class RequestHandler {
     }
 
     private void addNew() throws IOException {
-        Client client = newClients.poll();
+        NonBlockingClientHandler client = newClients.poll();
         while (client != null) {
             client.getSocketChannel().configureBlocking(false);
             client.getSocketChannel().register(selector, SelectionKey.OP_READ, client);

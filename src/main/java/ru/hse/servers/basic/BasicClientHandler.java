@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 import static ru.hse.utils.Utils.bubbleSort;
 
-public class Client {
+public class BasicClientHandler {
     private final Socket socket;
     private final ExecutorService workerThreadPool;
     private final ExecutorService responseWriter = Executors.newSingleThreadExecutor();
@@ -23,7 +23,7 @@ public class Client {
 
     private volatile boolean working = true;
 
-    public Client(Socket socket, ExecutorService workerThreadPool) throws IOException {
+    public BasicClientHandler(Socket socket, ExecutorService workerThreadPool) throws IOException {
         this.socket = socket;
         this.workerThreadPool = workerThreadPool;
         inputStream = new DataInputStream(socket.getInputStream());

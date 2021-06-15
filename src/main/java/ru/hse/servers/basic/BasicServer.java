@@ -20,7 +20,7 @@ public class BasicServer implements Server {
 
     private volatile boolean isWorking = true;
 
-    private final Set<Client> clients = ConcurrentHashMap.newKeySet();
+    private final Set<BasicClientHandler> clients = ConcurrentHashMap.newKeySet();
 
     @Override
     public void start() throws IOException {
@@ -35,7 +35,7 @@ public class BasicServer implements Server {
             serverSocket.close();
             workerThreadPool.shutdown();
             serverSocketService.shutdown();
-            clients.forEach(Client::close);
+            clients.forEach(BasicClientHandler::close);
         } catch (IOException ignored) { }
     }
 
@@ -44,7 +44,7 @@ public class BasicServer implements Server {
             while (!Thread.interrupted() && isWorking) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    Client client = new Client(clientSocket, workerThreadPool);
+                    BasicClientHandler client = new BasicClientHandler(clientSocket, workerThreadPool);
                     clients.add(client);
                     client.processClient();
                 } catch (IOException ignored1) { }

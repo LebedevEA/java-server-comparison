@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.ExecutorService;
 
-public class Client {
+public class AsyncClientHandler {
     private final AsynchronousSocketChannel socketChannel;
     private final ExecutorService workerThreadPool;
 
@@ -17,7 +17,7 @@ public class Client {
 
     private volatile boolean isWorkingFlag = true;
 
-    public Client(AsynchronousSocketChannel socketChannel, ExecutorService workerThreadPool) {
+    public AsyncClientHandler(AsynchronousSocketChannel socketChannel, ExecutorService workerThreadPool) {
         this.socketChannel = socketChannel;
         this.workerThreadPool = workerThreadPool;
     }

@@ -7,24 +7,23 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static ru.hse.utils.Utils.bubbleSort;
 
-public class Client {
+public class NonBlockingClientHandler {
     private final SocketChannel socketChannel;
     private final ExecutorService workerThreadPool;
     private final ByteBuffer requests = ByteBuffer.allocate(1024 * 16);
     private final ByteBuffer responses = ByteBuffer.allocate(1024 * 16);
     private int msgSize = -1;
 
-    private final Consumer<Client> registerResponse;
+    private final Consumer<NonBlockingClientHandler> registerResponse;
 
     private volatile boolean isWorking = true;
     private boolean isDone = false;
 
-    public Client(SocketChannel socketChannel, ExecutorService workerThreadPool, Consumer<Client> registerResponse) {
+    public NonBlockingClientHandler(SocketChannel socketChannel, ExecutorService workerThreadPool, Consumer<NonBlockingClientHandler> registerResponse) {
         this.socketChannel = socketChannel;
         this.workerThreadPool = workerThreadPool;
         this.registerResponse = registerResponse;

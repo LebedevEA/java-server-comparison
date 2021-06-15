@@ -18,7 +18,7 @@ public class AsyncServer implements Server {
 
     private volatile boolean isWorking = true;
 
-    private final Set<Client> clients = ConcurrentHashMap.newKeySet();
+    private final Set<AsyncClientHandler> clients = ConcurrentHashMap.newKeySet();
 
     @Override
     public void start() throws IOException {
@@ -41,7 +41,7 @@ public class AsyncServer implements Server {
     }
 
     private void handleSocketChannel(AsynchronousSocketChannel socketChannel) {
-        Client client = new Client(socketChannel, workerThreadPool);
+        AsyncClientHandler client = new AsyncClientHandler(socketChannel, workerThreadPool);
         clients.add(client);
         client.run();
     }
@@ -51,19 +51,19 @@ public class AsyncServer implements Server {
         isWorking = false;
         serverSocketChannel.close();
         workerThreadPool.shutdown();
-        clients.forEach(Client::stop);
+        clients.forEach(AsyncClientHandler::stop);
     }
 
     public static class ClientBufferWrapper {
-        private final Client client;
+        private final AsyncClientHandler client;
         private final ByteBuffer buffer;
 
-        public ClientBufferWrapper(Client client, ByteBuffer buffer) {
+        public ClientBufferWrapper(AsyncClientHandler client, ByteBuffer buffer) {
             this.client = client;
             this.buffer = buffer;
         }
 
-        public Client getClient() {
+        public AsyncClientHandler getClient() {
             return client;
         }
 

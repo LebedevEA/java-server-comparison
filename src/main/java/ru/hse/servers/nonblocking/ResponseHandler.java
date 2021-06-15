@@ -8,11 +8,11 @@ import java.util.Queue;
 
 public class ResponseHandler {
     private final Selector selector = Selector.open();
-    private final Queue<Client> newClients;
+    private final Queue<NonBlockingClientHandler> newClients;
 
     private volatile boolean isWorking = true;
 
-    public ResponseHandler(Queue<Client> addToResponses) throws IOException {
+    public ResponseHandler(Queue<NonBlockingClientHandler> addToResponses) throws IOException {
         this.newClients = addToResponses;
     }
 
@@ -46,7 +46,7 @@ public class ResponseHandler {
 
     private void handleSelectorKey(SelectionKey key) {
         try {
-            Client client = (Client) key.attachment();
+            NonBlockingClientHandler client = (NonBlockingClientHandler) key.attachment();
             client.write();
             if (!client.wantsWrite()) {
                 key.cancel();
@@ -55,7 +55,7 @@ public class ResponseHandler {
     }
 
     private void addNew() throws ClosedChannelException {
-        Client client = newClients.poll();
+        NonBlockingClientHandler client = newClients.poll();
         while (client != null) {
             client.getSocketChannel().register(selector, SelectionKey.OP_WRITE, client);
             client = newClients.poll();
