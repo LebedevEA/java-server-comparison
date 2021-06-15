@@ -157,8 +157,8 @@ public class TotalDataCollector {
 
     private static final int QUERY_NUMBER_PER_CLIENT = 10;
 
-    private static final int DEFAULT_DATA_LENGTH = 1500;
-    private static final int DEFAULT_CLIENT_NUMBER = 30;
+    private static final int DEFAULT_DATA_LENGTH = 750;
+    private static final int DEFAULT_CLIENT_NUMBER = 20;
     private static final int DEFAULT_QUERY_WAIT_TIME = 250;
 
     private static final String DIR = "data";
@@ -170,9 +170,9 @@ public class TotalDataCollector {
             "Async", AsyncServer::new
     );
 
-    private static final int LENGTH_STEP = 250;
+    private static final int LENGTH_STEP = 100;
     private static final int LENGTH_LOWER = 500;
-    private static final int LENGTH_UPPER = 5000;
+    private static final int LENGTH_UPPER = 1500;
 
     private static final int CLIENT_STEP = 5;
     private static final int CLIENT_LOWER = 5;
