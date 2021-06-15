@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 
 import static ru.hse.utils.Constants.THREADS;
 
-public class NonBlockingServer implements Server {
+public class NonBlockingServer extends Server {
     private ServerSocketChannel serverSocketChannel = null;
     private RequestHandler requestHandler = null;
     private ResponseHandler responseHandler = null;
@@ -32,17 +32,6 @@ public class NonBlockingServer implements Server {
 
     @Override
     public void start() throws IOException {
-        Executors.newSingleThreadExecutor().submit(() -> {
-            while (isWorking) {
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("FUCK");
-//                responseHandler.wakeup();
-            }
-        });
         serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.bind(new InetSocketAddress(Constants.PORT));
 
@@ -63,7 +52,8 @@ public class NonBlockingServer implements Server {
                     NonBlockingClientHandler client = new NonBlockingClientHandler(
                             clientSocketChannel,
                             workerThreadPool,
-                            this::registerResponse
+                            this::registerResponse,
+                            this::addWorkTime
                     );
                     clients.add(client);
                     addToRequests.add(client);

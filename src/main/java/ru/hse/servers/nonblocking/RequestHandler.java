@@ -5,7 +5,6 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class RequestHandler {
     private final Selector selector = Selector.open();
@@ -25,7 +24,6 @@ public class RequestHandler {
         try (Selector ignored = selector) {
             while (!Thread.interrupted() && isWorking) {
                 int selected = selector.select();
-//                System.out.println("Request selected " + selected);
                 if (selected > 0) {
                     handleSelected();
                 }
@@ -48,7 +46,6 @@ public class RequestHandler {
         }
     }
 
-    private final AtomicInteger counter = new AtomicInteger(0);
     private void handleSelectorKey(SelectionKey key) {
         NonBlockingClientHandler client = (NonBlockingClientHandler) key.attachment();
         client.read();

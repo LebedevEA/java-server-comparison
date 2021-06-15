@@ -17,6 +17,7 @@ import static ru.hse.utils.Utils.bubbleSort;
 public class NonBlockingClientHandler {
     private final SocketChannel socketChannel;
     private final ExecutorService workerThreadPool;
+    private final Consumer<Integer> addWorkTime;
     private final ByteBuffer requests = ByteBuffer.allocate(1024 * 16);
     private final Queue<ByteBuffer> responses = new ConcurrentLinkedQueue<>();
     private int msgSize = -1;
@@ -26,10 +27,16 @@ public class NonBlockingClientHandler {
     private volatile boolean isWorking = true;
     private final AtomicInteger isDone = new AtomicInteger(0);
 
-    public NonBlockingClientHandler(SocketChannel socketChannel, ExecutorService workerThreadPool, Consumer<NonBlockingClientHandler> registerResponse) {
+    public NonBlockingClientHandler(
+            SocketChannel socketChannel,
+            ExecutorService workerThreadPool,
+            Consumer<NonBlockingClientHandler> registerResponse,
+            Consumer<Integer> addWorkTime
+    ) {
         this.socketChannel = socketChannel;
         this.workerThreadPool = workerThreadPool;
         this.registerResponse = registerResponse;
+        this.addWorkTime = addWorkTime;
     }
 
     public SocketChannel getSocketChannel() {
@@ -93,7 +100,10 @@ public class NonBlockingClientHandler {
         isDone.incrementAndGet();
         ArrayHolder data = Utils.readArray(buf);
         workerThreadPool.submit(() -> {
+            long start = System.currentTimeMillis();
             bubbleSort(data.getArray());
+            long stop = System.currentTimeMillis();
+            addWorkTime.accept((int) (stop - start));
             sendResponse(data.getArray(), data.getId());
         });
     }

@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import static ru.hse.utils.Constants.PORT;
 import static ru.hse.utils.Constants.THREADS;
 
-public class BlockingServer implements Server {
+public class BlockingServer extends Server {
     private ServerSocket serverSocket = null;
 
     private final ExecutorService serverSocketService = Executors.newSingleThreadExecutor();
@@ -45,7 +45,11 @@ public class BlockingServer implements Server {
             while (!Thread.interrupted() && isWorking) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    BlockingClientHandler client = new BlockingClientHandler(clientSocket, workerThreadPool);
+                    BlockingClientHandler client = new BlockingClientHandler(
+                            clientSocket,
+                            workerThreadPool,
+                            this::addWorkTime
+                    );
                     clients.add(client);
                     client.processClient();
                 } catch (IOException ignored1) { }

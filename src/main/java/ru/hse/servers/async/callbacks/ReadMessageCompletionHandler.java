@@ -21,7 +21,10 @@ public class ReadMessageCompletionHandler implements CompletionHandler<Integer, 
         try {
             ArrayHolder data = Utils.readArray(attachment.getRequests().array());
             attachment.getWorkerThreadPool().submit(() -> {
+                long start = System.currentTimeMillis();
                 bubbleSort(data.getArray());
+                long stop = System.currentTimeMillis();
+                attachment.addWorkTime((int) (stop - start));
                 attachment.writeData(serializeArray(data.getArray(), data.getId()));
             });
         } catch (InvalidProtocolBufferException e) {

@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 
 import static ru.hse.utils.Constants.THREADS;
 
-public class AsyncServer implements Server {
+public class AsyncServer extends Server {
     private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(THREADS);
     private AsynchronousServerSocketChannel serverSocketChannel = null;
 
@@ -42,7 +42,11 @@ public class AsyncServer implements Server {
     }
 
     private void handleSocketChannel(AsynchronousSocketChannel socketChannel) {
-        AsyncClientHandler client = new AsyncClientHandler(socketChannel, workerThreadPool);
+        AsyncClientHandler client = new AsyncClientHandler(
+                socketChannel,
+                workerThreadPool,
+                this::addWorkTime
+        );
         clients.add(client);
         client.run();
     }

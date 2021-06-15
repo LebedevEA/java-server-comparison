@@ -105,9 +105,9 @@ public class TestingState {
 
     public boolean isValid() {
         return switch (changing) {
-            case DATA_LENGTH -> dataLength < upperBound;
-            case CLIENT_NUMBER -> clientNumber < upperBound;
-            case QUERY_WAIT_TIME -> queryWaitTime < upperBound;
+            case DATA_LENGTH -> dataLength <= upperBound;
+            case CLIENT_NUMBER -> clientNumber <= upperBound;
+            case QUERY_WAIT_TIME -> queryWaitTime <= upperBound;
         };
     }
 
@@ -116,10 +116,10 @@ public class TestingState {
             case DATA_LENGTH -> dataLength += step;
             case CLIENT_NUMBER -> clientNumber += step;
             case QUERY_WAIT_TIME -> queryWaitTime += step;
-        };
+        }
     }
 
-    public Result runTest() {
+    public Result runTest() throws Exception {
         Server server = architecture.get();
         var tester = new ServerTester(server, dataLength, clientNumber, queryWaitTime, queryNumberPerClient);
         ServerResult result = tester.test();

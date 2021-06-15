@@ -14,16 +14,28 @@ public class Result {
     private final int queryWorkTimeOnServer;
     private final int queryWaitTimeOnClient;
 
-    public Result(TestingState state, List<Integer> queryWorkTimeOnServer, List<Integer> queryWaitTimeOnClient) {
+    public Result(TestingState state, int queryWorkTimeOnServer, List<Integer> queryWaitTimeOnClient) {
         architecture = state.getArchitecture();
         dataLength = state.getDataLength();
         clientNumber = state.getClientNumber();
         queryWaitTime = state.getQueryWaitTime();
         queryNumberPerClient = state.getQueryNumberPerClient();
 
-        long sum = queryWorkTimeOnServer.stream().mapToLong(i -> i).sum() / queryWorkTimeOnServer.size();
-        this.queryWorkTimeOnServer = (int) sum;
-        sum = queryWaitTimeOnClient.stream().mapToLong(i -> i).sum() / queryWaitTimeOnClient.size();
+        this.queryWorkTimeOnServer = queryWorkTimeOnServer;
+
+        long sum = queryWaitTimeOnClient.stream().mapToLong(i -> i).sum() / queryWaitTimeOnClient.size();
         this.queryWaitTimeOnClient = (int) sum;
+    }
+
+    @Override
+    public String toString() {
+        return "Result{" +
+                "dataLength=" + dataLength +
+                ", clientNumber=" + clientNumber +
+                ", queryWaitTime=" + queryWaitTime +
+                ", queryNumberPerClient=" + queryNumberPerClient +
+                ", queryWorkTimeOnServer=" + queryWorkTimeOnServer +
+                ", queryWaitTimeOnClient=" + queryWaitTimeOnClient +
+                '}';
     }
 }

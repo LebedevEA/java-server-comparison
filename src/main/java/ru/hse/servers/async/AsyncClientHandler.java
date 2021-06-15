@@ -8,18 +8,25 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 public class AsyncClientHandler {
     private final AsynchronousSocketChannel socketChannel;
+    private final Consumer<Integer> addWorkTime;
     private final ExecutorService workerThreadPool;
 
     private ByteBuffer requests = null;
 
     private volatile boolean isWorkingFlag = true;
 
-    public AsyncClientHandler(AsynchronousSocketChannel socketChannel, ExecutorService workerThreadPool) {
+    public AsyncClientHandler(
+            AsynchronousSocketChannel socketChannel,
+            ExecutorService workerThreadPool,
+            Consumer<Integer> addWorkTime
+    ) {
         this.socketChannel = socketChannel;
         this.workerThreadPool = workerThreadPool;
+        this.addWorkTime = addWorkTime;
     }
 
     public void run() {
@@ -67,5 +74,9 @@ public class AsyncClientHandler {
 
     public ExecutorService getWorkerThreadPool() {
         return workerThreadPool;
+    }
+
+    public void addWorkTime(int time) {
+        addWorkTime.accept(time);
     }
 }
