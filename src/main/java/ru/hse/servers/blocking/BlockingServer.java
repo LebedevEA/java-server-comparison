@@ -1,4 +1,4 @@
-package ru.hse.servers.basic;
+package ru.hse.servers.blocking;
 
 import ru.hse.servers.Server;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 import static ru.hse.utils.Constants.PORT;
 
-public class BasicServer implements Server {
+public class BlockingServer implements Server {
     private ServerSocket serverSocket = null;
 
     private final ExecutorService serverSocketService = Executors.newSingleThreadExecutor();
@@ -20,7 +20,7 @@ public class BasicServer implements Server {
 
     private volatile boolean isWorking = true;
 
-    private final Set<BasicClientHandler> clients = ConcurrentHashMap.newKeySet();
+    private final Set<BlockingClientHandler> clients = ConcurrentHashMap.newKeySet();
 
     @Override
     public void start() throws IOException {
@@ -35,7 +35,7 @@ public class BasicServer implements Server {
             serverSocket.close();
             workerThreadPool.shutdown();
             serverSocketService.shutdown();
-            clients.forEach(BasicClientHandler::close);
+            clients.forEach(BlockingClientHandler::close);
         } catch (IOException ignored) { }
     }
 
@@ -44,7 +44,7 @@ public class BasicServer implements Server {
             while (!Thread.interrupted() && isWorking) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    BasicClientHandler client = new BasicClientHandler(clientSocket, workerThreadPool);
+                    BlockingClientHandler client = new BlockingClientHandler(clientSocket, workerThreadPool);
                     clients.add(client);
                     client.processClient();
                 } catch (IOException ignored1) { }

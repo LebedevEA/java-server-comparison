@@ -1,4 +1,4 @@
-package ru.hse.servers.basic;
+package ru.hse.servers.blocking;
 
 import ru.hse.utils.Utils;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 import static ru.hse.utils.Utils.bubbleSort;
 
-public class BasicClientHandler {
+public class BlockingClientHandler {
     private final Socket socket;
     private final ExecutorService workerThreadPool;
     private final ExecutorService responseWriter = Executors.newSingleThreadExecutor();
@@ -23,7 +23,7 @@ public class BasicClientHandler {
 
     private volatile boolean working = true;
 
-    public BasicClientHandler(Socket socket, ExecutorService workerThreadPool) throws IOException {
+    public BlockingClientHandler(Socket socket, ExecutorService workerThreadPool) throws IOException {
         this.socket = socket;
         this.workerThreadPool = workerThreadPool;
         inputStream = new DataInputStream(socket.getInputStream());

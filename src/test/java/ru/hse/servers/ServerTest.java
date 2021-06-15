@@ -2,7 +2,7 @@ package ru.hse.servers;
 
 import org.junit.jupiter.api.Test;
 import ru.hse.servers.async.AsyncServer;
-import ru.hse.servers.basic.BasicServer;
+import ru.hse.servers.blocking.BlockingServer;
 import ru.hse.servers.nonblocking.NonBlockingServer;
 
 import java.util.ArrayList;
@@ -35,11 +35,11 @@ class ServerTest {
     }
 
     @Test
-    public void basicTest() throws Exception {
-        baseServerTest(BasicServer::new, 1);
-        baseServerTest(BasicServer::new, 10);
-        baseServerTest(BasicServer::new, 100);
-        baseServerTest(BasicServer::new, 1000);
+    public void blockingTest() throws Exception {
+        baseServerTest(BlockingServer::new, 1);
+        baseServerTest(BlockingServer::new, 10);
+        baseServerTest(BlockingServer::new, 100);
+        baseServerTest(BlockingServer::new, 1000);
     }
 
     @Test
