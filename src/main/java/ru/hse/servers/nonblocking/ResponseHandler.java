@@ -49,7 +49,7 @@ public class ResponseHandler {
             NonBlockingClientHandler client = (NonBlockingClientHandler) key.attachment();
             client.write();
             if (!client.wantsWrite()) {
-                key.cancel();
+                key.interestOps(0);
             }
         } catch (IOException ignored) { }
     }

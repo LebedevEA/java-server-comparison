@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static ru.hse.utils.Utils.*;
 
@@ -27,6 +26,8 @@ public class TestClient  implements Callable<ArrayTestPair> {
             var inputStream = new DataInputStream(socket.getInputStream());
             var outputStream = new DataOutputStream(socket.getOutputStream());
             writeArray(outputStream, data);
+            writeArray(outputStream, data);
+            readArray(inputStream);
             sortedData = readArray(inputStream);
         }
 

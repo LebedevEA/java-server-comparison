@@ -25,6 +25,7 @@ public class RequestHandler {
         try (Selector ignored = selector) {
             while (!Thread.interrupted() && isWorking) {
                 int selected = selector.select();
+//                System.out.println("Request selected " + selected);
                 if (selected > 0) {
                     handleSelected();
                 }

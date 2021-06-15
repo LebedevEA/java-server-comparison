@@ -5,8 +5,10 @@ import ru.hse.utils.Utils;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static ru.hse.utils.Utils.bubbleSort;
@@ -15,13 +17,13 @@ public class NonBlockingClientHandler {
     private final SocketChannel socketChannel;
     private final ExecutorService workerThreadPool;
     private final ByteBuffer requests = ByteBuffer.allocate(1024 * 16);
-    private final ByteBuffer responses = ByteBuffer.allocate(1024 * 16);
+    private final Queue<ByteBuffer> responses = new ConcurrentLinkedQueue<>();
     private int msgSize = -1;
 
     private final Consumer<NonBlockingClientHandler> registerResponse;
 
     private volatile boolean isWorking = true;
-    private boolean isDone = false;
+    private final AtomicInteger isDone = new AtomicInteger(0);
 
     public NonBlockingClientHandler(SocketChannel socketChannel, ExecutorService workerThreadPool, Consumer<NonBlockingClientHandler> registerResponse) {
         this.socketChannel = socketChannel;
@@ -33,9 +35,11 @@ public class NonBlockingClientHandler {
         return socketChannel;
     }
     public void write() throws IOException {
-        responses.flip();
-        socketChannel.write(responses);
-        responses.compact();
+        if (responses.isEmpty()) return;
+        socketChannel.write(responses.peek());
+        if (!responses.isEmpty() && !responses.peek().hasRemaining()) {
+            responses.poll();
+        }
     }
 
     public void read() {
@@ -85,7 +89,7 @@ public class NonBlockingClientHandler {
     }
 
     private void handleMessage(byte[] buf) throws IOException {
-        isDone = true;
+        isDone.incrementAndGet();
         int[] data = Utils.readArray(buf);
         workerThreadPool.submit(() -> {
             bubbleSort(data);
@@ -97,16 +101,16 @@ public class NonBlockingClientHandler {
         if (!isWorking) return;
 
         byte[] toSend = Utils.serializeArray(data);
-        responses.putInt(toSend.length);
-        responses.put(toSend);
+        ByteBuffer response = ByteBuffer.allocate(toSend.length + 4);
+        response.putInt(toSend.length);
+        response.put(toSend);
+        response.flip();
+        responses.offer(response);
         registerResponse.accept(this);
     }
 
     public boolean wantsWrite() {
-        responses.flip();
-        boolean hasRemaining = responses.hasRemaining();
-        responses.compact();
-        return hasRemaining;
+        return !responses.isEmpty();
     }
 
     public void stop() {
@@ -119,20 +123,6 @@ public class NonBlockingClientHandler {
     }
 
     public boolean done() {
-        return isDone;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                socketChannel,
-                workerThreadPool,
-                requests,
-                responses,
-                msgSize,
-                registerResponse,
-                isWorking,
-                isDone
-        );
+        return isDone.get() == 2;
     }
 }
