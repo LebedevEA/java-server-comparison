@@ -16,6 +16,9 @@ public class Client {
     private final AsynchronousSocketChannel socketChannel;
     private final ExecutorService workerThreadPool;
 
+    private ByteBuffer requests = null;
+    private ByteBuffer responses = null;
+
     private volatile boolean isWorking = true;
 
     public Client(AsynchronousSocketChannel socketChannel, ExecutorService workerThreadPool) {
@@ -28,26 +31,26 @@ public class Client {
     }
 
     private void readSize() {
-        ByteBuffer size = ByteBuffer.allocate(4);
+        requests = ByteBuffer.allocate(4);
         socketChannel.read(
-                size,
-                new AsyncServer.ClientBufferWrapper(this, size),
+                requests,
+                this,
                 new CompletionHandler<>() {
                     @Override
-                    public void completed(Integer result, AsyncServer.ClientBufferWrapper attachment) {
+                    public void completed(Integer result, Client attachment) {
                         if (!isWorking || result == -1) return;
 
-                        if (attachment.getBuffer().hasRemaining()) {
-                            socketChannel.read(attachment.getBuffer(), attachment, this);
+                        if (attachment.requests.hasRemaining()) {
+                            socketChannel.read(attachment.requests, attachment, this);
                             return;
                         }
-                        attachment.getBuffer().flip();
-                        int msgSize = attachment.getBuffer().getInt();
-                        attachment.getClient().readMsg(msgSize);
+                        attachment.requests.flip();
+                        int msgSize = attachment.requests.getInt();
+                        attachment.readMsg(msgSize);
                     }
 
                     @Override
-                    public void failed(Throwable exc, AsyncServer.ClientBufferWrapper attachment) {
+                    public void failed(Throwable exc, Client attachment) {
                         throw new RuntimeException(exc);
                     }
                 }
@@ -55,29 +58,29 @@ public class Client {
     }
 
     private void readMsg(int msgSize) {
-        ByteBuffer msg = ByteBuffer.allocate(msgSize);
+        requests = ByteBuffer.allocate(msgSize);
         socketChannel.read(
-                msg,
-                new AsyncServer.ClientBufferWrapper(this, msg),
+                requests,
+                this,
                 new CompletionHandler<>() {
                     @Override
-                    public void completed(Integer result, AsyncServer.ClientBufferWrapper attachment) {
+                    public void completed(Integer result, Client attachment) {
                         if (!isWorking || result == -1) return;
 
-                        if (attachment.getBuffer().hasRemaining()) {
-                            socketChannel.read(attachment.getBuffer(), attachment, this);
+                        if (attachment.requests.hasRemaining()) {
+                            socketChannel.read(attachment.requests, attachment, this);
                         }
                         try {
-                            int[] data = Utils.readArray(attachment.getBuffer().array());
+                            int[] data = Utils.readArray(attachment.requests.array());
                             handleData(data);
                         } catch (InvalidProtocolBufferException e) {
                             e.printStackTrace();
                         }
-                        attachment.getClient().run();
+                        attachment.run();
                     }
 
                     @Override
-                    public void failed(Throwable exc, AsyncServer.ClientBufferWrapper attachment) {
+                    public void failed(Throwable exc, Client attachment) {
                         throw new RuntimeException(exc);
                     }
                 }
@@ -92,25 +95,25 @@ public class Client {
     }
 
     private void writeData(byte[] data) {
-        ByteBuffer msg = ByteBuffer.allocate(data.length + 4);
-        msg.putInt(data.length);
-        msg.put(data);
-        msg.flip();
+        responses = ByteBuffer.allocate(data.length + 4);
+        responses.putInt(data.length);
+        responses.put(data);
+        responses.flip();
         socketChannel.write(
-                msg,
-                new AsyncServer.ClientBufferWrapper(this, msg),
+                responses,
+                this,
                 new CompletionHandler<>() {
                     @Override
-                    public void completed(Integer result, AsyncServer.ClientBufferWrapper attachment) {
+                    public void completed(Integer result, Client attachment) {
                         if (!isWorking) return;
 
-                        if (attachment.getBuffer().hasRemaining()) {
-                            socketChannel.write(attachment.getBuffer(), attachment, this);
+                        if (attachment.responses.hasRemaining()) {
+                            socketChannel.write(attachment.responses, attachment, this);
                         }
                     }
 
                     @Override
-                    public void failed(Throwable exc, AsyncServer.ClientBufferWrapper attachment) {
+                    public void failed(Throwable exc, Client attachment) {
                         throw new RuntimeException(exc);
                     }
                 }
