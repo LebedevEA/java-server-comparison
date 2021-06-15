@@ -9,19 +9,15 @@ import ru.hse.testing.stats.Result;
 import ru.hse.testing.stats.TestingState;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static java.nio.file.Paths.get;
 import static ru.hse.utils.Utils.runTesting;
 
 public class TotalDataCollector {

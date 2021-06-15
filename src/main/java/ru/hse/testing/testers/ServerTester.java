@@ -3,7 +3,6 @@ package ru.hse.testing.testers;
 import ru.hse.servers.Server;
 import ru.hse.testing.stats.ServerResult;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;

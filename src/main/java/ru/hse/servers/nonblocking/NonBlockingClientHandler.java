@@ -132,8 +132,4 @@ public class NonBlockingClientHandler {
             e.printStackTrace();
         }
     }
-
-    public boolean done() {
-        return isDone.get() == 2;
-    }
 }

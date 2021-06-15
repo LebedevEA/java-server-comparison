@@ -1,12 +1,8 @@
 package ru.hse.testing.stats;
 
-import ru.hse.servers.Server;
-
 import java.util.List;
-import java.util.function.Supplier;
 
 public class Result {
-    private final Supplier<Server> architecture;
     private final int dataLength; // aka N
     private final int clientNumber; // aka M
     private final int queryWaitTime; // aka ∆
@@ -15,7 +11,6 @@ public class Result {
     private final double queryWaitTimeOnClient;
 
     public Result(TestingState state, double queryWorkTimeOnServer, List<Integer> queryWaitTimeOnClient) {
-        architecture = state.getArchitecture();
         dataLength = state.getDataLength();
         clientNumber = state.getClientNumber();
         queryWaitTime = state.getQueryWaitTime();
@@ -23,8 +18,7 @@ public class Result {
 
         this.queryWorkTimeOnServer = queryWorkTimeOnServer;
 
-        double sum = (double) queryWaitTimeOnClient.stream().mapToLong(i -> i).sum() / (double) queryWaitTimeOnClient.size();
-        this.queryWaitTimeOnClient = sum;
+        this.queryWaitTimeOnClient = (double) queryWaitTimeOnClient.stream().mapToLong(i -> i).sum() / (double) queryWaitTimeOnClient.size();
     }
 
     @Override
