@@ -1,5 +1,6 @@
 package ru.hse.servers.blocking;
 
+import ru.hse.utils.ArrayHolder;
 import ru.hse.utils.Utils;
 
 import java.io.DataInputStream;
@@ -30,10 +31,10 @@ public class BlockingClientHandler {
         outputStream = new DataOutputStream(socket.getOutputStream());
     }
 
-    private void sendResponse(int[] data) {
+    private void sendResponse(int[] data, int id) {
         responseWriter.submit(() -> {
             try {
-                Utils.writeArray(outputStream, data);
+                Utils.writeArray(outputStream, data, id);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -44,10 +45,10 @@ public class BlockingClientHandler {
         requestReader.submit(() -> {
             try {
                 while(!Thread.interrupted() && working) {
-                    int[] data = Utils.readArray(inputStream);
+                    ArrayHolder data = Utils.readArray(inputStream);
                     workerThreadPool.submit(() -> {
-                        bubbleSort(data);
-                        sendResponse(data);
+                        bubbleSort(data.getArray());
+                        sendResponse(data.getArray(), data.getId());
                     });
                 }
             } catch (IOException ignored) { }

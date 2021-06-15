@@ -11,12 +11,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static ru.hse.utils.Constants.PORT;
+import static ru.hse.utils.Constants.THREADS;
 
 public class BlockingServer implements Server {
     private ServerSocket serverSocket = null;
 
     private final ExecutorService serverSocketService = Executors.newSingleThreadExecutor();
-    private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(16);
+    private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(THREADS);
 
     private volatile boolean isWorking = true;
 

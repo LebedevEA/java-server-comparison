@@ -2,6 +2,7 @@ package ru.hse.servers.async.callbacks;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import ru.hse.servers.async.AsyncClientHandler;
+import ru.hse.utils.ArrayHolder;
 import ru.hse.utils.Utils;
 
 import java.nio.channels.CompletionHandler;
@@ -18,10 +19,10 @@ public class ReadMessageCompletionHandler implements CompletionHandler<Integer, 
             attachment.getSocketChannel().read(attachment.getRequests(), attachment, this);
         }
         try {
-            int[] data = Utils.readArray(attachment.getRequests().array());
+            ArrayHolder data = Utils.readArray(attachment.getRequests().array());
             attachment.getWorkerThreadPool().submit(() -> {
-                bubbleSort(data);
-                attachment.writeData(serializeArray(data));
+                bubbleSort(data.getArray());
+                attachment.writeData(serializeArray(data.getArray(), data.getId()));
             });
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();

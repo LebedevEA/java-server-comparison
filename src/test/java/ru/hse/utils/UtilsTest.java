@@ -35,18 +35,26 @@ class UtilsTest {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream(1024)) {
             DataOutputStream outputStream = new DataOutputStream(out);
 
-            writeArray(outputStream, arr1);
-            writeArray(outputStream, arr2);
-            writeArray(outputStream, arr3);
+            writeArray(outputStream, arr1, 1);
+            writeArray(outputStream, arr2, 2);
+            writeArray(outputStream, arr3, 3);
 
             byte[] buf = out.toByteArray();
 
             try (ByteArrayInputStream in = new ByteArrayInputStream(buf)) {
                 DataInputStream inputStream = new DataInputStream(in);
 
-                assertArrayEquals(arr1, readArray(inputStream));
-                assertArrayEquals(arr2, readArray(inputStream));
-                assertArrayEquals(arr3, readArray(inputStream));
+                var r1 = readArray(inputStream);
+                var r2 = readArray(inputStream);
+                var r3 = readArray(inputStream);
+
+                assertArrayEquals(arr1, r1.getArray());
+                assertArrayEquals(arr2, r2.getArray());
+                assertArrayEquals(arr3, r3.getArray());
+
+                assertEquals(1, r1.getId());
+                assertEquals(2, r2.getId());
+                assertEquals(3, r3.getId());
 
                 assertThrows(
                         EOFException.class,

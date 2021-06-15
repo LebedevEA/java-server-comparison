@@ -28,9 +28,9 @@ public final class ArrayProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013array.proto\022\005utils\"\026\n\005Array\022\r\n\005array\030\002" +
-      " \003(\005B&\n\026ru.hse.utils.protocolsB\nArrayPro" +
-      "toP\001"
+      "\n\013array.proto\022\005utils\"\"\n\005Array\022\n\n\002id\030\001 \002(" +
+      "\005\022\r\n\005array\030\002 \003(\005B&\n\026ru.hse.utils.protoco" +
+      "lsB\nArrayProtoP\001"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -41,7 +41,7 @@ public final class ArrayProto {
     internal_static_utils_Array_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_utils_Array_descriptor,
-        new java.lang.String[] { "Array", });
+        new java.lang.String[] { "Id", "Array", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

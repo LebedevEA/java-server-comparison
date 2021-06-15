@@ -28,13 +28,13 @@ public class Utils {
         }
     }
 
-    public static void writeArray(DataOutputStream outputStream, int[] data) throws IOException {
-        byte[] buf = serializeArray(data);
+    public static void writeArray(DataOutputStream outputStream, int[] data, int id) throws IOException {
+        byte[] buf = serializeArray(data, id);
         outputStream.writeInt(buf.length);
         outputStream.write(buf);
     }
 
-    public static int[] readArray(DataInputStream inputStream) throws IOException {
+    public static ArrayHolder readArray(DataInputStream inputStream) throws IOException {
         int bufLen = inputStream.readInt();
         byte[] buf = new byte[bufLen];
         inputStream.readFully(buf);
@@ -42,8 +42,9 @@ public class Utils {
         return readArray(buf);
     }
 
-    public static byte[] serializeArray(int[] data) {
+    public static byte[] serializeArray(int[] data, int id) {
         var array = Array.newBuilder()
+                .setId(id)
                 .addAllArray(
                         Arrays.stream(data)
                                 .boxed().
@@ -53,8 +54,9 @@ public class Utils {
         return array.toByteArray();
     }
 
-    public static int[] readArray(byte[] data) throws InvalidProtocolBufferException {
-        return Array.parseFrom(data).getArrayList().stream().mapToInt(i -> i).toArray();
+    public static ArrayHolder readArray(byte[] data) throws InvalidProtocolBufferException {
+        Array array = Array.parseFrom(data);
+        return new ArrayHolder(array.getId(), array.getArrayList().stream().mapToInt(i -> i).toArray());
     }
 
     public static int[] randomIntArray(Random random, int size) {

@@ -11,6 +11,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.*;
 
+import static ru.hse.utils.Constants.THREADS;
+
 public class NonBlockingServer implements Server {
     private ServerSocketChannel serverSocketChannel = null;
     private RequestHandler requestHandler = null;
@@ -19,7 +21,7 @@ public class NonBlockingServer implements Server {
     private final ExecutorService serverService = Executors.newSingleThreadExecutor();
     private final ExecutorService requestService = Executors.newSingleThreadExecutor();
     private final ExecutorService responseService = Executors.newSingleThreadExecutor();
-    private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(16);
+    private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(THREADS);
 
     private final Queue<NonBlockingClientHandler> addToRequests = new ConcurrentLinkedQueue<>();
     private final Queue<NonBlockingClientHandler> addToResponses = new ConcurrentLinkedQueue<>();

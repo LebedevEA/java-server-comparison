@@ -11,8 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static ru.hse.utils.Constants.THREADS;
+
 public class AsyncServer implements Server {
-    private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(16);
+    private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(THREADS);
     private AsynchronousServerSocketChannel serverSocketChannel = null;
 
     private volatile boolean isWorking = true;

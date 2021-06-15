@@ -8,6 +8,17 @@ public interface ArrayOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
+   * <code>required int32 id = 1;</code>
+   * @return Whether the id field is set.
+   */
+  boolean hasId();
+  /**
+   * <code>required int32 id = 1;</code>
+   * @return The id.
+   */
+  int getId();
+
+  /**
    * <code>repeated int32 array = 2;</code>
    * @return A list containing the array.
    */

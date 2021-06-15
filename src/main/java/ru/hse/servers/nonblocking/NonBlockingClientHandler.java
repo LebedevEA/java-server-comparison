@@ -1,5 +1,6 @@
 package ru.hse.servers.nonblocking;
 
+import ru.hse.utils.ArrayHolder;
 import ru.hse.utils.Utils;
 
 import java.io.IOException;
@@ -90,17 +91,17 @@ public class NonBlockingClientHandler {
 
     private void handleMessage(byte[] buf) throws IOException {
         isDone.incrementAndGet();
-        int[] data = Utils.readArray(buf);
+        ArrayHolder data = Utils.readArray(buf);
         workerThreadPool.submit(() -> {
-            bubbleSort(data);
-            sendResponse(data);
+            bubbleSort(data.getArray());
+            sendResponse(data.getArray(), data.getId());
         });
     }
 
-    private void sendResponse(int[] data) {
+    private void sendResponse(int[] data, int id) {
         if (!isWorking) return;
 
-        byte[] toSend = Utils.serializeArray(data);
+        byte[] toSend = Utils.serializeArray(data, id);
         ByteBuffer response = ByteBuffer.allocate(toSend.length + 4);
         response.putInt(toSend.length);
         response.put(toSend);
