@@ -5,7 +5,6 @@ import ru.hse.utils.Constants;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,23 +51,5 @@ public class AsyncServer implements Server {
         serverSocketChannel.close();
         workerThreadPool.shutdown();
         clients.forEach(AsyncClientHandler::stop);
-    }
-
-    public static class ClientBufferWrapper {
-        private final AsyncClientHandler client;
-        private final ByteBuffer buffer;
-
-        public ClientBufferWrapper(AsyncClientHandler client, ByteBuffer buffer) {
-            this.client = client;
-            this.buffer = buffer;
-        }
-
-        public AsyncClientHandler getClient() {
-            return client;
-        }
-
-        public ByteBuffer getBuffer() {
-            return buffer;
-        }
     }
 }

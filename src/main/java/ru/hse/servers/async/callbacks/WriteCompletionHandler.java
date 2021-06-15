@@ -12,6 +12,8 @@ public class WriteCompletionHandler implements CompletionHandler<Integer, WriteW
         if (attachment.getBuffer().hasRemaining()) {
             attachment.getSocketChannel().write(attachment.getBuffer(), attachment, this);
         }
+
+        attachment.restart();
     }
 
     @Override

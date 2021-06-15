@@ -1,6 +1,7 @@
 package ru.hse.servers;
 
 import org.junit.jupiter.api.Test;
+import ru.hse.servers.async.AsyncServer;
 import ru.hse.servers.basic.BasicServer;
 import ru.hse.servers.nonblocking.NonBlockingServer;
 
@@ -51,9 +52,9 @@ class ServerTest {
 
     @Test
     public void asyncTest() throws Exception {
-//        baseServerTest(AsyncServer::new, 1);
-//        baseServerTest(AsyncServer::new, 10);
-//        baseServerTest(AsyncServer::new, 100);
-//        baseServerTest(AsyncServer::new, 1000);
+        baseServerTest(AsyncServer::new, 1);
+        baseServerTest(AsyncServer::new, 10);
+        baseServerTest(AsyncServer::new, 100);
+        baseServerTest(AsyncServer::new, 1000);
     }
 }

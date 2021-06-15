@@ -5,8 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 
 public class WriteWrapper {
-    private AsyncClientHandler client;
-    private ByteBuffer buffer;
+    private final AsyncClientHandler client;
+    private final ByteBuffer buffer;
 
     public WriteWrapper(AsyncClientHandler client, ByteBuffer response) {
         this.client = client;
@@ -14,7 +14,7 @@ public class WriteWrapper {
     }
 
     public boolean isWorking() {
-        return false;
+        return client.isWorking();
     }
 
     public AsynchronousSocketChannel getSocketChannel() {
@@ -23,6 +23,10 @@ public class WriteWrapper {
 
     public ByteBuffer getBuffer() {
         return buffer;
+    }
+
+    public void restart() {
+        client.run();
     }
 }
 

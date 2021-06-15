@@ -26,7 +26,6 @@ public class ReadMessageCompletionHandler implements CompletionHandler<Integer, 
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
-        attachment.run();
     }
 
     @Override
