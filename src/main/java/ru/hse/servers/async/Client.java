@@ -17,7 +17,6 @@ public class Client {
     private final ExecutorService workerThreadPool;
 
     private ByteBuffer requests = null;
-    private ByteBuffer responses = null;
 
     private volatile boolean isWorking = true;
 
@@ -95,26 +94,24 @@ public class Client {
     }
 
     private void writeData(byte[] data) {
-        responses = ByteBuffer.allocate(data.length + 4);
-        responses.putInt(data.length);
-        responses.put(data);
-        responses.flip();
+        ByteBuffer response = ByteBuffer.allocate(data.length + 4);
+        response.putInt(data.length);
+        response.put(data);
+        response.flip();
         socketChannel.write(
-                responses,
-                this,
+                response,
+                new WriteWrapper(socketChannel, response),
                 new CompletionHandler<>() {
                     @Override
-                    public void completed(Integer result, Client attachment) {
-                        if (!isWorking) return;
-
-                        if (attachment.responses.hasRemaining()) {
-                            socketChannel.write(attachment.responses, attachment, this);
+                    public void completed(Integer result, WriteWrapper attachment) {
+                        if (attachment.buffer.hasRemaining()) {
+                            attachment.socketChannel.write(attachment.buffer, attachment, this);
                         }
                     }
 
                     @Override
-                    public void failed(Throwable exc, Client attachment) {
-                        throw new RuntimeException(exc);
+                    public void failed(Throwable exc, WriteWrapper attachment) {
+
                     }
                 }
         );
@@ -127,5 +124,15 @@ public class Client {
         } catch (IOException exception) {
             exception.printStackTrace();
         }
+    }
+}
+
+class WriteWrapper {
+    AsynchronousSocketChannel socketChannel;
+    ByteBuffer buffer;
+
+    public WriteWrapper(AsynchronousSocketChannel socketChannel, ByteBuffer response) {
+        this.socketChannel = socketChannel;
+        this.buffer = response;
     }
 }
