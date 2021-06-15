@@ -61,7 +61,7 @@ public class ServerTester {
                 .flatMap(client -> client.getWaitTimes().stream())
                 .collect(Collectors.toList());
 
-        int queryWorkTimeOnServer = server.getServerWorkTime();
+        double queryWorkTimeOnServer = server.getServerWorkTime();
         return new ServerResult(queryWorkTimeOnServer, queryWaitTimeOnClient);
     }
 }

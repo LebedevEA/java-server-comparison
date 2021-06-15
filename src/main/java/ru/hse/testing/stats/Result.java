@@ -11,10 +11,10 @@ public class Result {
     private final int clientNumber; // aka M
     private final int queryWaitTime; // aka ∆
     private final int queryNumberPerClient; // aka X
-    private final int queryWorkTimeOnServer;
-    private final int queryWaitTimeOnClient;
+    private final double queryWorkTimeOnServer;
+    private final double queryWaitTimeOnClient;
 
-    public Result(TestingState state, int queryWorkTimeOnServer, List<Integer> queryWaitTimeOnClient) {
+    public Result(TestingState state, double queryWorkTimeOnServer, List<Integer> queryWaitTimeOnClient) {
         architecture = state.getArchitecture();
         dataLength = state.getDataLength();
         clientNumber = state.getClientNumber();
@@ -23,8 +23,8 @@ public class Result {
 
         this.queryWorkTimeOnServer = queryWorkTimeOnServer;
 
-        long sum = queryWaitTimeOnClient.stream().mapToLong(i -> i).sum() / queryWaitTimeOnClient.size();
-        this.queryWaitTimeOnClient = (int) sum;
+        double sum = (double) queryWaitTimeOnClient.stream().mapToLong(i -> i).sum() / (double) queryWaitTimeOnClient.size();
+        this.queryWaitTimeOnClient = sum;
     }
 
     @Override
@@ -55,11 +55,11 @@ public class Result {
         return queryNumberPerClient;
     }
 
-    public int getQueryWorkTimeOnServer() {
+    public double getQueryWorkTimeOnServer() {
         return queryWorkTimeOnServer;
     }
 
-    public int getQueryWaitTimeOnClient() {
+    public double getQueryWaitTimeOnClient() {
         return queryWaitTimeOnClient;
     }
 }

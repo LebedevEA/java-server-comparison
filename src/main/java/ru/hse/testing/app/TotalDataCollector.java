@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -157,7 +158,7 @@ public class TotalDataCollector {
 
     private static final int QUERY_NUMBER_PER_CLIENT = 10;
 
-    private static final int DEFAULT_DATA_LENGTH = 750;
+    private static final int DEFAULT_DATA_LENGTH = 1250;
     private static final int DEFAULT_CLIENT_NUMBER = 20;
     private static final int DEFAULT_QUERY_WAIT_TIME = 250;
 
@@ -170,15 +171,15 @@ public class TotalDataCollector {
             "Async", AsyncServer::new
     );
 
-    private static final int LENGTH_STEP = 100;
-    private static final int LENGTH_LOWER = 500;
-    private static final int LENGTH_UPPER = 1500;
+    private static final int LENGTH_STEP = 200;
+    private static final int LENGTH_LOWER = 800;
+    private static final int LENGTH_UPPER = 3000;
 
     private static final int CLIENT_STEP = 5;
     private static final int CLIENT_LOWER = 5;
-    private static final int CLIENT_UPPER = 50;
+    private static final int CLIENT_UPPER = 85;
 
     private static final int WAIT_STEP = 25;
-    private static final int WAIT_LOWER = 25;
+    private static final int WAIT_LOWER = 5;
     private static final int WAIT_UPPER = 500;
 }
