@@ -22,11 +22,20 @@ public class Cli {
             return false;
         }
 
-        boolean set = switch (state.getChanging()) {
-            case DATA_LENGTH -> scanClientNumber(scanner) && scanQueryWaitTime(scanner);
-            case CLIENT_NUMBER -> scanDataLength(scanner) && scanQueryWaitTime(scanner);
-            case QUERY_WAIT_TIME -> scanDataLength(scanner) && scanClientNumber(scanner);
-        };
+        boolean set;
+        switch (state.getChanging()) {
+            case DATA_LENGTH:
+                set = scanClientNumber(scanner) && scanQueryWaitTime(scanner);
+                break;
+            case CLIENT_NUMBER:
+                set = scanDataLength(scanner) && scanQueryWaitTime(scanner);
+                break;
+            case QUERY_WAIT_TIME:
+                set = scanDataLength(scanner) && scanClientNumber(scanner);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
 
         if (!set) {
             return false;
@@ -110,7 +119,8 @@ public class Cli {
             System.out.print(">> ");
             String input = scanner.nextLine();
             input = input.trim().toLowerCase();
-            if ("blocking".equals(input)) {
+            if ("blocking".equals(input)) { // Хаха бага идеи,
+                                            // если заменить иф на свитч видно будет
                 state.setArchitecture(BlockingServer::new);
             } else if ("nonblocking".equals(input)) {
                 state.setArchitecture(NonBlockingServer::new);
@@ -171,13 +181,18 @@ public class Cli {
             }
 
             switch (Integer.parseInt(input)) {
-                case 1 -> state.setChanging(Parameter.DATA_LENGTH);
-                case 2 -> state.setChanging(Parameter.CLIENT_NUMBER);
-                case 3 -> state.setChanging(Parameter.QUERY_WAIT_TIME);
-                default -> {
+                case 1:
+                    state.setChanging(Parameter.DATA_LENGTH);
+                    break;
+                case 2:
+                    state.setChanging(Parameter.CLIENT_NUMBER);
+                    break;
+                case 3:
+                    state.setChanging(Parameter.QUERY_WAIT_TIME);
+                    break;
+                default:
                     System.out.println("Could not parse [1-3], try again");
                     continue;
-                }
             }
             return true;
         }

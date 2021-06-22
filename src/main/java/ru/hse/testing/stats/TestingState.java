@@ -89,33 +89,55 @@ public class TestingState {
 
     public void setLowerLimit(int value) {
         switch (changing) {
-            case DATA_LENGTH -> dataLength = value;
-            case CLIENT_NUMBER -> clientNumber = value;
-            case QUERY_WAIT_TIME -> queryWaitTime = value;
+            case DATA_LENGTH:
+                dataLength = value;
+                break;
+            case CLIENT_NUMBER:
+                clientNumber = value;
+                break;
+            case QUERY_WAIT_TIME:
+                queryWaitTime = value;
+                break;
         }
     }
 
     public int getLowerLimit() {
-        return switch (changing) {
-            case DATA_LENGTH -> dataLength;
-            case CLIENT_NUMBER -> clientNumber;
-            case QUERY_WAIT_TIME -> queryWaitTime;
-        };
+        switch (changing) {
+            case DATA_LENGTH:
+                return dataLength;
+            case CLIENT_NUMBER:
+                return clientNumber;
+            case QUERY_WAIT_TIME:
+                return queryWaitTime;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public boolean isValid() {
-        return switch (changing) {
-            case DATA_LENGTH -> dataLength <= upperBound;
-            case CLIENT_NUMBER -> clientNumber <= upperBound;
-            case QUERY_WAIT_TIME -> queryWaitTime <= upperBound;
-        };
+        switch (changing) {
+            case DATA_LENGTH:
+                return dataLength <= upperBound;
+            case CLIENT_NUMBER:
+                return clientNumber <= upperBound;
+            case QUERY_WAIT_TIME:
+                return queryWaitTime <= upperBound;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public void makeStep() {
         switch (changing) {
-            case DATA_LENGTH -> dataLength += step;
-            case CLIENT_NUMBER -> clientNumber += step;
-            case QUERY_WAIT_TIME -> queryWaitTime += step;
+            case DATA_LENGTH:
+                dataLength += step;
+                break;
+            case CLIENT_NUMBER:
+                clientNumber += step;
+                break;
+            case QUERY_WAIT_TIME:
+                queryWaitTime += step;
+                break;
         }
     }
 

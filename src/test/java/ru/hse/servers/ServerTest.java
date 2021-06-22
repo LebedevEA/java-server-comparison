@@ -39,7 +39,7 @@ class ServerTest {
         baseServerTest(BlockingServer::new, 1);
         baseServerTest(BlockingServer::new, 10);
         baseServerTest(BlockingServer::new, 100);
-        baseServerTest(BlockingServer::new, 1000);
+//        baseServerTest(BlockingServer::new, 1000);
     }
 
     @Test
@@ -47,7 +47,7 @@ class ServerTest {
         baseServerTest(NonBlockingServer::new, 1);
         baseServerTest(NonBlockingServer::new, 10);
         baseServerTest(NonBlockingServer::new, 100);
-        baseServerTest(NonBlockingServer::new, 1000);
+//        baseServerTest(NonBlockingServer::new, 1000);
     }
 
     @Test
@@ -55,6 +55,6 @@ class ServerTest {
         baseServerTest(AsyncServer::new, 1);
         baseServerTest(AsyncServer::new, 10);
         baseServerTest(AsyncServer::new, 100);
-        baseServerTest(AsyncServer::new, 1000);
+//        baseServerTest(AsyncServer::new, 1000);
     }
 }

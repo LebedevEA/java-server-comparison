@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class TotalDataCollector {
         writeCSV(resultMap, Parameter.QUERY_WAIT_TIME);
     }
 
-    private static final String CSV_HEADER = "Length, Clients, Wait, Queries, Server works, Mean client waits";
+    private static final String CSV_HEADER = "Length; Clients; Wait; Queries; Server works; Mean client waits";
 
     private static void writeCSV(Map<String, List<Result>> resultMap, Parameter changing) throws IOException {
         Path dir = Paths.get(".", DIR, changing.toString());
@@ -91,12 +92,12 @@ public class TotalDataCollector {
                 out.newLine();
                 for (var result : entry.getValue()) {
                     out.write(
-                            result.getDataLength() + ", " +
-                            result.getClientNumber() + ", " +
-                            result.getQueryWaitTime() + ", " +
-                            result.getQueryNumberPerClient() + ", " +
-                            result.getQueryWorkTimeOnServer() + ", " +
-                            result.getQueryWaitTimeOnClient()
+                            result.getDataLength() + "; " +
+                            result.getClientNumber() + "; " +
+                            result.getQueryWaitTime() + "; " +
+                            result.getQueryNumberPerClient() + "; " +
+                            String.valueOf(result.getQueryWorkTimeOnServer()).replace('.', ',') + "; " +
+                            String.valueOf(result.getQueryWaitTimeOnClient()).replace('.', ',')+ "; "
                     );
                     out.newLine();
                 }
